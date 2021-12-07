@@ -1,5 +1,6 @@
 //see LICENSE for license
 //authors: Vrishab Madduri
+package rle
 
 import Chisel._
 import chisel3.{Printable}
@@ -44,12 +45,17 @@ class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModu
 
   val cmd_router = Module(new CommandRouter)
   cmd_router.io.rocc_in <> io.cmd
+  io.resp <> cmd_router.io.rocc_out
+
+  val rle_encode = Module(new rleEncode)
+  rle_encode.io.rle_stage_cmd <> cmd_router.io.rle_stage_out
+  rle_encode.io.rle_encode_cmd <> cmd_router.io.rle_encode_out
 
 }
 
 class WithrleAccel extends Config ((site, here, up) => {
     case BuildRoCC => Seq((p: Parameters) => LazyModule(
-    new rleAccel(OpcodeSet.custom0 | OpcodeSet.custom1)(p)))
+    new rleAccel(OpcodeSet.custom0)(p))) // use just opcode 0
 })
 
 class WithrleAccelPrintf extends Config((site, here, up) => {

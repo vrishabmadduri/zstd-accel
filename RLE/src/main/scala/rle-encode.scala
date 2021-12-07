@@ -24,14 +24,14 @@ class rleEncode()(implicit p: Parameters) extends Module
 val input_length = io.rle_stage_cmd.bits.rs1
 val input_pointer = io.rle_stage_cmd.bits.rs2
 val output_pointer = io.rle_encode_cmd.bits.rs1
-val response_register = io.rle_encode_cmd.bits.rd // need to change rocc.h to account for rd
+val response_register = io.rle_encode_cmd.bits.inst.rd
 
 // logic here
 
 // create a queue that takes 128 bits and spits out 1 byte
-byte_spitter = Module(new Queue(UInt(8.W), 16)) // 16 entries * 8 bits = 128 bits
+val byte_spitter = Module(new Queue(UInt(8.W), 16)) // 16 entries * 8 bits = 128 bits
 val byte_counter = RegInit(0.U(5.W))
-write_queue = Module(new Queue(UInt(8.W), 2))
+val write_queue = Module(new Queue(UInt(8.W), 2))
 
 when (io.rle_stage_cmd.valid) {
   rleLogger.logInfo("input_length: %x\n", input_length)
@@ -40,7 +40,7 @@ when (io.rle_stage_cmd.valid) {
 
 when (io.rle_encode_cmd.valid) {
   rleLogger.logInfo("output_pointer: %x\n", output_pointer)
-  rleLogger.logInfo("encoded_length: %x\n", encoded_length)
+  rleLogger.logInfo("encoded_length: %x\n", response_register)
 }
 
 val request_fire = DecoupledHelper(
@@ -82,7 +82,7 @@ io.l1helperUserRead.req.valid := request_fire.fire(io.l1helperUserRead.req.ready
 // need to pull input_pointer from L2/where it's stored and store in local val
 val input_val = io.l1helperUserRead.resp.bits.data // placeholder
 byte_spitter.io.enq.valid := response_fire.fire(byte_spitter.io.enq.ready)
-io.l1helperUserWrite.resp.ready := response.fire(io.l1helperUserWrite.resp.valid) && (byte_counter === 16)
+io.l1helperUserWrite.resp.ready := response_fire.fire(io.l1helperUserWrite.resp.valid) && (byte_counter === 16.U)
 
 when(byte_spitter.io.enq.valid) {
   // increment the counter
@@ -94,7 +94,7 @@ when(byte_spitter.io.enq.valid) {
   }
 }
 
-byte_spitter.io.enq.bits := input_val(((byte_counter+1)<< 3 - 1), byte_counter << 3)
+byte_spitter.io.enq.bits := input_val(((byte_counter+1.U) << 3.U - 1.U), byte_counter << 3.U)
 
 val current_byte = RegInit(0.U(8.W))
 // create a register that keeps track of the previous byte
@@ -105,19 +105,23 @@ val output_val = RegInit(0.U(8.W))
 when(byte_spitter.io.deq.valid) {
   when (previous_byte_valid === false.B) {
     previous_byte := byte_spitter.io.deq.bits
+    previous_byte_valid := true.B
   } elsewhen {
     previous_byte := current_byte
   }
   current_byte := byte_spitter.io.deq.bits
 }
 
-val i = RegInit(0.U(4.W)) // register
-val count = RegInit(0.U(4.W))
+val i = RegInit(0.U(64.W)) // register
+val count = RegInit(0.U(64.W))
+val encoded_length = RegInit(0.U(64.W))
+val ch = RegInit(0.U(64.W))
 when(i < input_length) {
-  count := 1.U
-  ch = previous_byte
+  ch := previous_byte
   when (previous_byte === current_byte) {
     count := count + 1.U
+  } elsewhen((previous_byte =/= current_byte) || (i === 0.U)) {
+    count := 1.U
   }
   // add count, val to Queue
   // then cat count and val at the end and write to memory
@@ -125,6 +129,7 @@ when(i < input_length) {
 
   when(write_queue.io.enq.valid) { // FIXME: cat first
     write_queue.io.enq.bits := Cat(count, ch)
+    encoded_length := encoded_length + (PriorityEncoder(Reverse(count)) + 8.U)
   }
   i := i + 1.U
 }
@@ -137,7 +142,7 @@ io.l1helperUserWrite.req.ready := response_fire.fire(io.l1helperUserWrite.req.va
 io.l1helperUserWrite.req.bits.addr := output_pointer
 io.l1helperUserWrite.req.bits.data := output_val
 
-//encoded_length := output_val.length() ???
+response_register := encoded_length
 }
 
 /*

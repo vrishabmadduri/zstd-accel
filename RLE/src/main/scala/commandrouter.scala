@@ -12,36 +12,38 @@ import freechips.rocketchip.rocket.constants.MemoryOpConstants
 class CommandRouter()(implicit p: Parameters) extends Module {
 
 
-
-  val FUNCT_SFENCE = UInt(0)
-  val FUNCT_PROTO_PARSE_INFO = UInt(1)
-  val FUNCT_DO_PROTO_PARSE = UInt(2)
-  val FUNCT_MEM_SETUP = UInt(3)
-  val FUNCT_CHECK_COMPLETION = UInt(4)
+ // FUNCT_SFENCE, FUNCT_PROTO_PARSE_INFO
+  val FUNCT_RLE_STAGE = UInt(0)
+  val FUNCT_RLE_ENCODE = UInt(1)
+  // val FUNCT_DO_PROTO_PARSE = UInt(2)
+  // val FUNCT_MEM_SETUP = UInt(3)
+  // val FUNCT_CHECK_COMPLETION = UInt(4)
 
   val io = IO(new Bundle{
     val rocc_in = Decoupled(new RoCCCommand).flip
     val rocc_out = Decoupled(new RoCCResponse)
 
-    val sfence_out = Bool(OUTPUT)
-    val proto_parse_info_out = Decoupled(new RoCCCommand)
-    val do_proto_parse_out = Decoupled(new RoCCCommand)
-    val dmem_status_out = Valid(new RoCCCommand)
+    //val sfence_out = Bool(OUTPUT)
+    //val proto_parse_info_out = Decoupled(new RoCCCommand)
+    //val do_proto_parse_out = Decoupled(new RoCCCommand)
+    val rle_stage_out = Decoupled(new RoCCCommand)
+    val rle_encode_out = Decoupled(new RoCCCommand)
+    //val dmem_status_out = Valid(new RoCCCommand)
 
-    val fixed_alloc_region_addr = Valid(UInt(64.W))
-    val array_alloc_region_addr = Valid(UInt(64.W))
+    //val fixed_alloc_region_addr = Valid(UInt(64.W))
+    //val array_alloc_region_addr = Valid(UInt(64.W))
 
-    val no_writes_inflight = Input(Bool())
-    val completed_toplevel_bufs = Input(UInt(64.W))
+    //val no_writes_inflight = Input(Bool())
+    //val completed_toplevel_bufs = Input(UInt(64.W))
 
   })
 
   val track_number_dispatched_parse_commands = RegInit(0.U(64.W))
   when (io.rocc_in.fire()) {
-    when (io.rocc_in.bits.inst.funct === FUNCT_DO_PROTO_PARSE) {
+    when (io.rocc_in.bits.inst.funct === FUNCT_RLE_STAGE) {
       val next_track_number_dispatched_parse_commands = track_number_dispatched_parse_commands + 1.U
       track_number_dispatched_parse_commands := next_track_number_dispatched_parse_commands
-      rleLogger.logInfo("dispatched bufs: current 0x%x, next 0x%x\n",
+      rleLogger.logInfo("dispatched encodes: current 0x%x, next 0x%x\n",
         track_number_dispatched_parse_commands,
         next_track_number_dispatched_parse_commands)
     }
@@ -51,23 +53,46 @@ class CommandRouter()(implicit p: Parameters) extends Module {
     rleLogger.logInfo("gotcmd funct %x, rd %x, rs1val %x, rs2val %x\n", io.rocc_in.bits.inst.funct, io.rocc_in.bits.inst.rd, io.rocc_in.bits.rs1, io.rocc_in.bits.rs2)
   }
 
-  io.dmem_status_out.bits <> io.rocc_in.bits
-  io.dmem_status_out.valid := io.rocc_in.fire()
+  //io.dmem_status_out.bits <> io.rocc_in.bits
+  //io.dmem_status_out.valid := io.rocc_in.fire()
 
-  val proto_parse_info_out_queue = Module(new Queue(new RoCCCommand, 2))
-  val do_proto_parse_out_queue = Module(new Queue(new RoCCCommand, 2))
+  //val proto_parse_info_out_queue = Module(new Queue(new RoCCCommand, 2))
+  //val do_proto_parse_out_queue = Module(new Queue(new RoCCCommand, 2))
 
-  io.proto_parse_info_out <> proto_parse_info_out_queue.io.deq
-  io.do_proto_parse_out <> do_proto_parse_out_queue.io.deq
+  val rle_stage_out_queue = Module(new Queue(new RoCCCommand, 2))
+  val rle_encode_out_queue = Module(new Queue(new RoCCCommand, 2))
+
+  io.rle_stage_out <> rle_stage_out_queue.io.deq
+  io.rle_encode_out <> rle_encode_out_queue.io.deq
+
+  //io.proto_parse_info_out <> proto_parse_info_out_queue.io.deq
+  //io.do_proto_parse_out <> do_proto_parse_out_queue.io.deq
 
   val current_funct = io.rocc_in.bits.inst.funct
-
+ /*
   val sfence_fire = DecoupledHelper(
     io.rocc_in.valid,
     current_funct === FUNCT_SFENCE
   )
   io.sfence_out := sfence_fire.fire()
+  */
 
+  val rle_stage_fire = DecoupledHelper(
+    io.rocc_in.valid,
+    rle_stage_out_queue.io.enq.ready,
+    current_funct === FUNCT_RLE_STAGE
+  )
+  io.rle_stage_out := rle_stage_fire.fire()
+
+  val rle_encode_fire = DecoupledHelper(
+    io.rocc_in.valid,
+    rle_encode_out_queue.io.enq.ready,
+    current_funct === FUNCT_RLE_ENCODE,
+    io.rocc_out.ready
+  )
+  io.rle_encode_out := rle_encode_fire.fire()
+
+  /*
   val proto_parse_info_fire = DecoupledHelper(
     io.rocc_in.valid,
     proto_parse_info_out_queue.io.enq.ready,
@@ -111,13 +136,13 @@ class CommandRouter()(implicit p: Parameters) extends Module {
     rleLogger.logInfo("[commandrouter] WAITING FOR COMPLETION. no_writes_inflight 0x%d, completed 0x%x, dispatched 0x%x, rocc_out.ready 0x%x\n",
       io.no_writes_inflight, io.completed_toplevel_bufs, track_number_dispatched_parse_commands, io.rocc_out.ready)
   }
-
-  io.rocc_out.valid := do_check_completion_fire.fire(io.rocc_out.ready)
+*/
+  io.rocc_out.valid := rle_encode_fire.fire(io.rocc_out.ready)
   io.rocc_out.bits.rd := io.rocc_in.bits.inst.rd
   io.rocc_out.bits.data := track_number_dispatched_parse_commands
 
 
-  io.rocc_in.ready := sfence_fire.fire(io.rocc_in.valid) || proto_parse_info_fire.fire(io.rocc_in.valid) || do_proto_parse_fire.fire(io.rocc_in.valid) || do_alloc_region_addr_fire.fire(io.rocc_in.valid) || do_check_completion_fire.fire(io.rocc_in.valid)
+  io.rocc_in.ready := rle_stage_fire.fire(io.rocc_in.valid) || rle_encode_fire.fire(io.rocc_in.valid)
 
 
 
