@@ -22,9 +22,14 @@ class WrapBundle(nPTWPorts: Int)(implicit p: Parameters) extends Bundle {
 
 class rleAccel (opcodes: OpcodeSet) (implicit p: Parameters) extends LazyRoCC(opcodes = opcodes) {
     override lazy val module = new rleAccelImp(this)
+    val l2_read_rle = LazyModule(new L1MemHelper("[l2_read_rle]"))
+    tlNode := l2_read_rle.masterNode
+
+    val l2_write_rle = LazyModule(new L1MemHelper("[l2_write_rle]"))
+    tlNode := l2_write_rle.masterNode
 }
 
-class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModuleImp(outer) {
+class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModuleImp(outer) with MemoryOpConstants {
   // route commands into this queue
   val cmd = Queue(io.cmd)
   val resp = Queue(io.resp)
@@ -51,11 +56,19 @@ class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModu
   rle_encode.io.rle_stage_cmd <> cmd_router.io.rle_stage_out
   rle_encode.io.rle_encode_cmd <> cmd_router.io.rle_encode_out
 
+  outer.l2_read_rle.module.io.userif <> rle_encode.io.l1helperUserRead
+  outer.l2_write_rle.module.io.userif <> rle_encode.io.l1helperUserWrite
+  //outer.l2_read_rle.module.io.sfence <> cmd_router.io.sfence_out
 }
 
 class WithrleAccel extends Config ((site, here, up) => {
-    case BuildRoCC => Seq((p: Parameters) => LazyModule(
-    new rleAccel(OpcodeSet.custom0)(p))) // use just opcode 0
+    
+    case BuildRoCC => up(BuildRoCC) ++ Seq(
+    (p: Parameters) => {
+      val rle = LazyModule.apply(new rleAccel(OpcodeSet.custom0)(p))
+      rle
+    }
+  ) // use just opcode 0
 })
 
 class WithrleAccelPrintf extends Config((site, here, up) => {

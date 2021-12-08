@@ -94,7 +94,8 @@ when(byte_spitter.io.enq.valid) {
   }
 }
 
-byte_spitter.io.enq.bits := input_val(((byte_counter+1.U) << 3.U - 1.U), byte_counter << 3.U)
+
+byte_spitter.io.enq.bits := (input_val >> (byte_counter << 3.U)) & 0xFF.U
 
 val current_byte = RegInit(0.U(8.W))
 // create a register that keeps track of the previous byte
@@ -106,7 +107,7 @@ when(byte_spitter.io.deq.valid) {
   when (previous_byte_valid === false.B) {
     previous_byte := byte_spitter.io.deq.bits
     previous_byte_valid := true.B
-  } elsewhen {
+  } .otherwise {
     previous_byte := current_byte
   }
   current_byte := byte_spitter.io.deq.bits
@@ -120,7 +121,7 @@ when(i < input_length) {
   ch := previous_byte
   when (previous_byte === current_byte) {
     count := count + 1.U
-  } elsewhen((previous_byte =/= current_byte) || (i === 0.U)) {
+  } .elsewhen((previous_byte =/= current_byte) || (i === 0.U)) {
     count := 1.U
   }
   // add count, val to Queue
