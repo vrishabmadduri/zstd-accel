@@ -24,5 +24,5 @@ int main(void) {
     result = rle_encode(&data);
     if(result != answer)
         return -1;
-    return 1;
+    return 0;
 }

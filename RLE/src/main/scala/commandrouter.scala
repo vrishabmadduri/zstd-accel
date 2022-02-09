@@ -21,7 +21,7 @@ class CommandRouter()(implicit p: Parameters) extends Module {
 
   val io = IO(new Bundle{
     val rocc_in = Decoupled(new RoCCCommand).flip
-    val rocc_out = Decoupled(new RoCCResponse)
+    //val rocc_out = Decoupled(new RoCCResponse)
 
     //val sfence_out = Bool(OUTPUT)
     //val proto_parse_info_out = Decoupled(new RoCCCommand)
@@ -82,15 +82,15 @@ class CommandRouter()(implicit p: Parameters) extends Module {
     rle_stage_out_queue.io.enq.ready,
     current_funct === FUNCT_RLE_STAGE
   )
-  io.rle_stage_out := rle_stage_fire.fire()
+  rle_stage_out_queue.io.enq.valid := rle_stage_fire.fire()
 
   val rle_encode_fire = DecoupledHelper(
     io.rocc_in.valid,
     rle_encode_out_queue.io.enq.ready,
     current_funct === FUNCT_RLE_ENCODE,
-    io.rocc_out.ready
+    //io.rocc_out.ready
   )
-  io.rle_encode_out := rle_encode_fire.fire()
+  rle_encode_out_queue.io.enq.valid := rle_encode_fire.fire()
 
   /*
   val proto_parse_info_fire = DecoupledHelper(
@@ -137,9 +137,9 @@ class CommandRouter()(implicit p: Parameters) extends Module {
       io.no_writes_inflight, io.completed_toplevel_bufs, track_number_dispatched_parse_commands, io.rocc_out.ready)
   }
 */
-  io.rocc_out.valid := rle_encode_fire.fire(io.rocc_out.ready)
-  io.rocc_out.bits.rd := io.rocc_in.bits.inst.rd
-  io.rocc_out.bits.data := track_number_dispatched_parse_commands
+  //io.rocc_out.valid := rle_encode_fire.fire(io.rocc_out.ready)
+  //io.rocc_out.bits.rd := io.rocc_in.bits.inst.rd
+  //io.rocc_out.bits.data := track_number_dispatched_parse_commands
 
 
   io.rocc_in.ready := rle_stage_fire.fire(io.rocc_in.valid) || rle_encode_fire.fire(io.rocc_in.valid)

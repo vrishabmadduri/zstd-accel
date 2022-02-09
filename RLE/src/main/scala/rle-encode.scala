@@ -18,6 +18,7 @@ class rleEncode()(implicit p: Parameters) extends Module
 
     val rle_stage_cmd = Decoupled(new RoCCCommand).flip
     val rle_encode_cmd = Decoupled(new RoCCCommand).flip
+    val rocc_out = Decoupled(new RoCCResponse)
 
   })
 
@@ -139,11 +140,12 @@ when(write_queue.io.deq.valid) { // FIXME: cat first
   }
 
 // write output val to cache
-io.l1helperUserWrite.req.ready := response_fire.fire(io.l1helperUserWrite.req.valid)
+io.l1helperUserWrite.req.valid := response_fire.fire() //io.l1helperUserWrite.req.valid
 io.l1helperUserWrite.req.bits.addr := output_pointer
 io.l1helperUserWrite.req.bits.data := output_val
 
-response_register := encoded_length
+io.rocc_out.bits.rd := response_register
+io.rocc_out.bits.data := encoded_length
 }
 
 /*

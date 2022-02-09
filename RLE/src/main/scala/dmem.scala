@@ -7,7 +7,7 @@ import freechips.rocketchip.rocket.{HellaCacheReq, TLB, TLBPTWIO, TLBConfig, MSt
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
 
-case object rleTLB extends Field[Option[TLBConfig]](None)
+case object RleTLB extends Field[Option[TLBConfig]](None)
 
 class DmemModule(implicit p: Parameters) extends LazyModule {
   lazy val module = new DmemModuleImp(this)
@@ -38,7 +38,7 @@ class DmemModuleImp(outer: DmemModule)(implicit p: Parameters) extends LazyModul
     status := io.status.bits
   }
 
-  val tlb = Module(new TLB(false, log2Ceil(coreDataBytes), p(rleTLB).get)(edge, p))
+  val tlb = Module(new TLB(false, log2Ceil(coreDataBytes), p(RleTLB).get)(edge, p))
   tlb.io.req.valid := io.req.valid
   tlb.io.req.bits.vaddr := io.req.bits.addr
   tlb.io.req.bits.size := io.req.bits.size

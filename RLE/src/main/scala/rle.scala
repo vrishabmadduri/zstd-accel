@@ -14,13 +14,7 @@ import freechips.rocketchip.tilelink._
 
 case object rleAccelPrintfEnable extends Field[Boolean](false)
 
-class WrapBundle(nPTWPorts: Int)(implicit p: Parameters) extends Bundle {
-  val io = new RoCCIO(nPTWPorts)
-  val clock = Clock(INPUT)
-  val reset = Input(UInt(1.W))
-}
-
-class rleAccel (opcodes: OpcodeSet) (implicit p: Parameters) extends LazyRoCC(opcodes = opcodes) {
+class rleAccel (opcodes: OpcodeSet) (implicit p: Parameters) extends LazyRoCC(opcodes = opcodes, nPTWPorts = 5) {
     override lazy val module = new rleAccelImp(this)
     val l2_read_rle = LazyModule(new L1MemHelper("[l2_read_rle]"))
     tlNode := l2_read_rle.masterNode
@@ -29,10 +23,10 @@ class rleAccel (opcodes: OpcodeSet) (implicit p: Parameters) extends LazyRoCC(op
     tlNode := l2_write_rle.masterNode
 }
 
-class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModuleImp(outer) with MemoryOpConstants {
+class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModuleImp(outer) {
   // route commands into this queue
-  val cmd = Queue(io.cmd)
-  val resp = Queue(io.resp)
+  //val cmd = Queue(io.cmd)
+  //val resp = Queue(io.resp)
   // The parts of the command are as follows
   // inst - the parts of the instruction itself
   //   opcode
@@ -48,13 +42,15 @@ class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModu
 
   // hook up rle encode/decode modules here
 
+  // io.interrupt := Bool(false)
+
   val cmd_router = Module(new CommandRouter)
   cmd_router.io.rocc_in <> io.cmd
-  io.resp <> cmd_router.io.rocc_out
 
   val rle_encode = Module(new rleEncode)
   rle_encode.io.rle_stage_cmd <> cmd_router.io.rle_stage_out
   rle_encode.io.rle_encode_cmd <> cmd_router.io.rle_encode_out
+  io.resp <> rle_encode.io.rocc_out
 
   outer.l2_read_rle.module.io.userif <> rle_encode.io.l1helperUserRead
   outer.l2_write_rle.module.io.userif <> rle_encode.io.l1helperUserWrite
@@ -62,7 +58,7 @@ class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModu
 }
 
 class WithrleAccel extends Config ((site, here, up) => {
-    
+    case RleTLB => Some(TLBConfig(nSets = 1, nWays = 4, nSectors = 1, nSuperpageEntries = 1))
     case BuildRoCC => up(BuildRoCC) ++ Seq(
     (p: Parameters) => {
       val rle = LazyModule.apply(new rleAccel(OpcodeSet.custom0)(p))

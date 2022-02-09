@@ -85,7 +85,7 @@ class L1MemHelperModule(outer: L1MemHelper, printInfo: String = "", queueRequest
     status := io.status.bits
   }
 
-  val tlb = Module(new TLB(false, log2Ceil(coreDataBytes), p(rleTLB).get)(edge, p))
+  val tlb = Module(new TLB(false, log2Ceil(coreDataBytes), p(RleTLB).get)(edge, p))
   tlb.io.req.valid := request_input.valid
   tlb.io.req.bits.vaddr := request_input.bits.addr
   tlb.io.req.bits.size := request_input.bits.size
