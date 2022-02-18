@@ -21,7 +21,8 @@ int main(void) {
     // write some test
     unsigned long result;
     unsigned long answer = 0x600;
-    result = rle_encode(&data);
+    rle_stage(3, &data);
+    result = rle_encode(&result);
     if(result != answer)
         return -1;
     return 0;
