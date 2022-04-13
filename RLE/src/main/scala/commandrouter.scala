@@ -92,6 +92,10 @@ class CommandRouter()(implicit p: Parameters) extends Module {
   )
   rle_encode_out_queue.io.enq.valid := rle_encode_fire.fire()
 
+
+  rle_stage_out_queue.io.enq.bits <> io.rocc_in.bits
+  rle_encode_out_queue.io.enq.bits <> io.rocc_in.bits
+
   /*
   val proto_parse_info_fire = DecoupledHelper(
     io.rocc_in.valid,
@@ -141,6 +145,8 @@ class CommandRouter()(implicit p: Parameters) extends Module {
   //io.rocc_out.bits.rd := io.rocc_in.bits.inst.rd
   //io.rocc_out.bits.data := track_number_dispatched_parse_commands
 
+
+ io_rle_encode_out_bits_inst_rd := io.rocc_in.bits.inst.rd
 
   io.rocc_in.ready := rle_stage_fire.fire(io.rocc_in.valid) || rle_encode_fire.fire(io.rocc_in.valid)
 

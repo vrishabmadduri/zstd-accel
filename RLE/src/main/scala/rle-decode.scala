@@ -9,23 +9,23 @@ import freechips.rocketchip.rocket.{TLBConfig}
 import freechips.rocketchip.util.DecoupledHelper
 import freechips.rocketchip.rocket.constants.MemoryOpConstants
 
-class rleEncode()(implicit p: Parameters) extends Module
+class rleDecode()(implicit p: Parameters) extends Module
      with MemoryOpConstants {
 
   val io = IO(new Bundle {
     val l1helperUserRead = new L1MemHelperBundle
     val l1helperUserWrite = new L1MemHelperBundle
 
-    val rle_stage_cmd = Decoupled(new RoCCCommand).flip
-    val rle_encode_cmd = Decoupled(new RoCCCommand).flip
+    val rle_staged_cmd = Decoupled(new RoCCCommand).flip
+    val rle_decode_cmd = Decoupled(new RoCCCommand).flip
     val rocc_out = Decoupled(new RoCCResponse)
 
   })
 
-val input_length = io.rle_stage_cmd.bits.rs1
-val input_pointer = io.rle_stage_cmd.bits.rs2
-val output_pointer = io.rle_encode_cmd.bits.rs1
-val response_register = io.rle_encode_cmd.bits.inst.rd
+val input_length = io.rle_staged_cmd.bits.rs1
+val input_pointer = io.rle_staged_cmd.bits.rs2
+val output_pointer = io.rle_decode_cmd.bits.rs1
+val response_register = io.rle_decode_cmd.bits.inst.rd
 
 // logic here
 
@@ -34,31 +34,26 @@ val byte_spitter = Module(new Queue(UInt(8.W), 16)) // 16 entries * 8 bits = 128
 val byte_counter = RegInit(0.U(5.W))
 val write_queue = Module(new Queue(UInt(8.W), 2))
 
-when (io.rle_stage_cmd.valid) {
+when (io.rle_staged_cmd.valid) {
   rleLogger.logInfo("input_length: %x\n", input_length)
   rleLogger.logInfo("input_pointer: %x\n", input_pointer)
 }
 
-when (io.rle_encode_cmd.valid) {
+when (io.rle_decode_cmd.valid) {
   rleLogger.logInfo("output_pointer: %x\n", output_pointer)
   rleLogger.logInfo("encoded_length: %x\n", response_register)
 }
 
 val request_fire = DecoupledHelper(
     io.l1helperUserRead.req.ready,
-    io.rle_stage_cmd.valid,
-    io.rle_encode_cmd.valid
+    io.rle_staged_cmd.valid,
+    io.rle_decode_cmd.valid
 )
 
 val response_fire = DecoupledHelper(
-  io.l1helperUserRead.resp.valid, 
+  io.l1helperUserWrite.resp.valid, 
   byte_spitter.io.enq.ready
 )
-
-// another helper for writing to cache
-
-// counter for address translation/number of requests
-// 16-byte address aligned (enforce in software/assert in hardware)
 
 val addrinc = RegInit(UInt(0, 64.W))
 
@@ -100,65 +95,50 @@ when(byte_spitter.io.enq.valid) {
 
 byte_spitter.io.enq.bits := (input_val >> (byte_counter << 3.U)) & 0xFF.U
 
-val current_byte = RegInit(0.U(8.W))
-// create a register that keeps track of the previous byte
-val previous_byte = RegInit(0.U(8.W))
-val previous_byte_valid = RegInit(false.B)
-val output_val = RegInit(0.U(8.W))
+val data_byte = RegInit(0.U(8.W))
+val output_byte = RegInit(0.U(8.W))
+// create a register that keeps track of the count byte
+val count_byte = RegInit(0.U(8.W))
+val output_val = RegInit(0.U(128.W))
 
 when(byte_spitter.io.deq.valid) {
-  when (previous_byte_valid === false.B) {
-    previous_byte := byte_spitter.io.deq.bits
-    previous_byte_valid := true.B
-  } .otherwise {
-    previous_byte := current_byte
-  }
-  current_byte := byte_spitter.io.deq.bits
+    count_byte := byte_spitter.io.deq.bits
+    data_byte := byte_spitter.io.deq.bits
 }
 
-val i = RegInit(0.U(64.W)) // register
-val count = RegInit(0.U(64.W))
-val encoded_length = RegInit(0.U(64.W))
-val ch = RegInit(0.U(64.W))
+val i = RegInit(0.U(64.W))
+val j = RegInit(count_byte(64.W))
+val decoded_length = RegInit(0.U(64.W))
+
 when(i < input_length) {
-  ch := previous_byte
-  when (previous_byte === current_byte) {
-    count := count + 1.U
-  } .elsewhen((previous_byte =/= current_byte) || (i === 0.U)) {
-    count := 1.U
-  }
-  // add count, val to Queue
-  // then cat count and val at the end and write to memory
-  // dequeue every time
+    output_byte := data_byte
+    when (j > 0.U) {
+        output_val := Cat(output_byte, data_byte)
+        j = j - 1.U
+    }
 
-  when(write_queue.io.enq.valid) { // FIXME: cat first
-    write_queue.io.enq.bits := Cat(count, ch)
-    encoded_length := encoded_length + (PriorityEncoder(Reverse(count)) + 8.U)
-  }
-  i := i + 1.U
+    when(write_queue.io.enq.valid) { // FIXME: cat first
+    write_queue.io.enq.bits := output_val
+    decoded_length := decoded_length + (PriorityEncoder(Reverse(count)) + 8.U)
+    }
+    i := i + 1.U
 }
+
 when(write_queue.io.deq.valid) { // FIXME: cat first
-    output_val := write_queue.io.deq.bits
+    cache_val := write_queue.io.deq.bits
   }
 
 // write output val to cache
 io.l1helperUserWrite.req.valid := response_fire.fire() //io.l1helperUserWrite.req.valid
 io.l1helperUserWrite.req.bits.addr := output_pointer
-io.l1helperUserWrite.req.bits.data := output_val
+io.l1helperUserWrite.req.bits.data := cache_val
 
-io.rle_encode_cmd.ready := request_fire.fire(io.rle_encode_cmd.valid) && (addrinc === input_length)
+io.rle_decode_cmd.ready := request_fire.fire(io.rle_decode_cmd.valid) && (addrinc === input_length)
 
 io.rocc_out.bits.rd := response_register
-io.rocc_out.bits.data := encoded_length
+io.rocc_out.bits.data := decoded_length
 }
 
-/*
-if (message[j] == message[j+1]):
-                count = count+1
-                j = j+1
-            else:
-                break
-        encoded_message=encoded_message+str(count)+ch
-        i = j+1
-    return encoded_message
-*/
+
+
+
