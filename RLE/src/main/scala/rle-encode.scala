@@ -55,8 +55,12 @@ val response_fire = DecoupledHelper(
   byte_spitter.io.enq.ready
 )
 
-// another helper for writing to cache
+// add another decoupledhelper for writing
 
+val response_write_fire = DecoupledHelper(
+  io.l1helperUserWrite.req.ready,
+  write_queue.io.deq.valid
+)
 // counter for address translation/number of requests
 // 16-byte address aligned (enforce in software/assert in hardware)
 
@@ -85,7 +89,7 @@ io.l1helperUserRead.req.valid := request_fire.fire(io.l1helperUserRead.req.ready
 // need to pull input_pointer from L2/where it's stored and store in local val
 val input_val = io.l1helperUserRead.resp.bits.data // placeholder
 byte_spitter.io.enq.valid := response_fire.fire(byte_spitter.io.enq.ready)
-io.l1helperUserWrite.resp.ready := response_fire.fire(io.l1helperUserWrite.resp.valid) && (byte_counter === 16.U)
+io.l1helperUserWrite.resp.ready := response_write_fire.fire(io.l1helperUserWrite.resp.valid) && (byte_counter === 16.U)
 
 when(byte_spitter.io.enq.valid) {
   // increment the counter
@@ -142,7 +146,7 @@ when(write_queue.io.deq.valid) { // FIXME: cat first
   }
 
 // write output val to cache
-io.l1helperUserWrite.req.valid := response_fire.fire() //io.l1helperUserWrite.req.valid
+io.l1helperUserWrite.req.valid := response_write_fire.fire() //io.l1helperUserWrite.req.valid
 io.l1helperUserWrite.req.bits.addr := output_pointer
 io.l1helperUserWrite.req.bits.data := output_val
 

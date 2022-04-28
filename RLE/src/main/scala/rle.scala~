@@ -16,17 +16,11 @@ case object rleAccelPrintfEnable extends Field[Boolean](false)
 
 class rleAccel (opcodes: OpcodeSet) (implicit p: Parameters) extends LazyRoCC(opcodes = opcodes, nPTWPorts = 5) {
     override lazy val module = new rleAccelImp(this)
-    //val l2_read_rle = LazyModule(new L1MemHelper("[l2_read_rle]"))
-    //tlNode := l2_read_rle.masterNode
+    val l2_read_rle = LazyModule(new L1MemHelper("[l2_read_rle]"))
+    tlNode := l2_read_rle.masterNode
 
-    //val l2_write_rle = LazyModule(new L1MemHelper("[l2_write_rle]"))
-    //tlNode := l2_write_rle.masterNode
-
-    val l2_read_rle_decode = LazyModule(new L1MemHelper("[l2_read_rle_decode]"))
-    tlNode := l2_read_rle_decode.masterNode
-
-    val l2_write_rle_decode = LazyModule(new L1MemHelper("[l2_write_rle_decode]"))
-    tlNode := l2_write_rle_decode.masterNode
+    val l2_write_rle = LazyModule(new L1MemHelper("[l2_write_rle]"))
+    tlNode := l2_write_rle.masterNode
 }
 
 class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModuleImp(outer) {
@@ -53,21 +47,13 @@ class rleAccelImp(outer: rleAccel) (implicit p: Parameters) extends LazyRoCCModu
   val cmd_router = Module(new CommandRouter)
   cmd_router.io.rocc_in <> io.cmd
 
-  //val rle_encode = Module(new rleEncode)
-  //rle_encode.io.rle_stage_cmd <> cmd_router.io.rle_stage_out
-  //rle_encode.io.rle_encode_cmd <> cmd_router.io.rle_encode_out
-  //io.resp <> rle_encode.io.rocc_out
+  val rle_encode = Module(new rleEncode)
+  rle_encode.io.rle_stage_cmd <> cmd_router.io.rle_stage_out
+  rle_encode.io.rle_encode_cmd <> cmd_router.io.rle_encode_out
+  io.resp <> rle_encode.io.rocc_out
 
-  //outer.l2_read_rle.module.io.userif <> rle_encode.io.l1helperUserRead
-  //outer.l2_write_rle.module.io.userif <> rle_encode.io.l1helperUserWrite
-
-  val rle_decode = Module(new rleDecode)
-  rle_decode.io.rle_staged_cmd <> cmd_router.io.rle_staged_out
-  rle_decode.io.rle_decode_cmd <> cmd_router.io.rle_decode_out
-  io.resp <> rle_decode.io.rocc_out
-
-  outer.l2_read_rle_decode.module.io.userif <> rle_decode.io.l1helperUserRead
-  outer.l2_write_rle_decode.module.io.userif <> rle_decode.io.l1helperUserWrite
+  outer.l2_read_rle.module.io.userif <> rle_encode.io.l1helperUserRead
+  outer.l2_write_rle.module.io.userif <> rle_encode.io.l1helperUserWrite
   //outer.l2_read_rle.module.io.sfence <> cmd_router.io.sfence_out
 }
 
