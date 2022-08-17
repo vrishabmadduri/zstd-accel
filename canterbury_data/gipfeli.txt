@@ -1,0 +1,13 @@
+Compressor name         Compress.  Decompress. Compr. size  Ratio Filename
+memcpy                  34208 MB/s  34691 MB/s      152089 100.00 ../canterbury/alice29.txt
+gipfeli 2016-07-13        203 MB/s    338 MB/s       70625  46.44 ../canterbury/alice29.txt
+gipfeli 2016-07-13        192 MB/s    330 MB/s       61934  49.48 ../canterbury/asyoulik.txt
+gipfeli 2016-07-13        223 MB/s    375 MB/s      186182  43.63 ../canterbury/lcet10.txt
+gipfeli 2016-07-13        194 MB/s    315 MB/s      250030  51.89 ../canterbury/plrabn12.txt
+gipfeli 2016-07-13        353 MB/s    412 MB/s       10204  41.47 ../canterbury/cp.html
+gipfeli 2016-07-13        394 MB/s    591 MB/s      374782  36.40 ../canterbury/kennedy.xls
+gipfeli 2016-07-13        659 MB/s    772 MB/s       83379  16.25 ../canterbury/ptt5
+gipfeli 2016-07-13        350 MB/s    646 MB/s        2213  52.35 ../canterbury/xargs.1
+gipfeli 2016-07-13        435 MB/s    709 MB/s        4228  37.92 ../canterbury/fields.c
+gipfeli 2016-07-13        390 MB/s    749 MB/s        1596  42.89 ../canterbury/grammar.lsp
+gipfeli 2016-07-13        319 MB/s    298 MB/s       17063  44.62 ../canterbury/sum

@@ -1,0 +1,14 @@
+Compressor name         Compress.  Decompress. Compr. size  Ratio Filename
+memcpy                   6575 MB/s   6698 MB/s    10192446 100.00 ../silesia/dickens
+zstd_fast 1.5.0 --1       249 MB/s   1366 MB/s     5781020  56.72 ../silesia/dickens
+zstd_fast 1.5.0 --1       416 MB/s   1361 MB/s    22027595  43.01 ../silesia/mozilla
+zstd_fast 1.5.0 --1       385 MB/s   1894 MB/s     5093348  51.08 ../silesia/mr
+zstd_fast 1.5.0 --1       757 MB/s   1891 MB/s     3559267  10.61 ../silesia/nci
+zstd_fast 1.5.0 --1       349 MB/s   1532 MB/s     4060898  66.01 ../silesia/ooffice
+zstd_fast 1.5.0 --1       364 MB/s   1756 MB/s     4232700  41.97 ../silesia/osdb
+zstd_fast 1.5.0 --1       248 MB/s   1120 MB/s     2452266  37.00 ../silesia/reymont
+zstd_fast 1.5.0 --1       451 MB/s   1700 MB/s     6293999  29.13 ../silesia/samba
+zstd_fast 1.5.0 --1       343 MB/s   2540 MB/s     6550053  90.32 ../silesia/sao
+zstd_fast 1.5.0 --1       292 MB/s   1329 MB/s    17670128  42.62 ../silesia/webster
+zstd_fast 1.5.0 --1       595 MB/s   1988 MB/s      882720  16.51 ../silesia/xml
+zstd_fast 1.5.0 --1      2704 MB/s  12113 MB/s     8469221  99.94 ../silesia/x-ray

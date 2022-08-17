@@ -1,0 +1,13 @@
+Compressor name         Compress.  Decompress. Compr. size  Ratio Filename
+memcpy                  35385 MB/s  35173 MB/s      152089 100.00 ../canterbury/alice29.txt
+brotli 1.0.9 -1           139 MB/s    306 MB/s       60292  39.64 ../canterbury/alice29.txt
+brotli 1.0.9 -1           130 MB/s    285 MB/s       53394  42.65 ../canterbury/asyoulik.txt
+brotli 1.0.9 -1           164 MB/s    335 MB/s      154908  36.30 ../canterbury/lcet10.txt
+brotli 1.0.9 -1           138 MB/s    277 MB/s      206088  42.77 ../canterbury/plrabn12.txt
+brotli 1.0.9 -1           208 MB/s    328 MB/s        9174  37.29 ../canterbury/cp.html
+brotli 1.0.9 -1           309 MB/s    404 MB/s      171354  16.64 ../canterbury/kennedy.xls
+brotli 1.0.9 -1           582 MB/s    657 MB/s       59004  11.50 ../canterbury/ptt5
+brotli 1.0.9 -1           214 MB/s    312 MB/s        1941  45.92 ../canterbury/xargs.1
+brotli 1.0.9 -1           270 MB/s    385 MB/s        3761  33.73 ../canterbury/fields.c
+brotli 1.0.9 -1           239 MB/s    355 MB/s        1396  37.52 ../canterbury/grammar.lsp
+brotli 1.0.9 -1           230 MB/s    292 MB/s       14305  37.41 ../canterbury/sum

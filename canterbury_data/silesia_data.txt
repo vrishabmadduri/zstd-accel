@@ -1,0 +1,38 @@
+Compressor name         Compress.  Decompress. Compr. size  Ratio Filename
+memcpy                   6575 MB/s   6698 MB/s    10192446 100.00 ../silesia/dickens
+zstd_fast 1.5.0 --1       249 MB/s   1366 MB/s     5781020  56.72 ../silesia/dickens
+zstd_fast 1.5.0 --5       338 MB/s   1609 MB/s     6962123  68.31 ../silesia/dickens
+snappy 2020-07-11         223 MB/s    680 MB/s     6340267  62.21 ../silesia/dickens
+zstd_fast 1.5.0 --1       416 MB/s   1361 MB/s    22027595  43.01 ../silesia/mozilla
+zstd_fast 1.5.0 --5       518 MB/s   1507 MB/s    24696780  48.22 ../silesia/mozilla
+snappy 2020-07-11         382 MB/s   1186 MB/s    26690826  52.11 ../silesia/mozilla
+zstd_fast 1.5.0 --1       385 MB/s   1894 MB/s     5093348  51.08 ../silesia/mr
+zstd_fast 1.5.0 --5       528 MB/s   2072 MB/s     5407587  54.24 ../silesia/mr
+snappy 2020-07-11         391 MB/s    969 MB/s     5440451  54.57 ../silesia/mr
+zstd_fast 1.5.0 --1       757 MB/s   1891 MB/s     3559267  10.61 ../silesia/nci
+zstd_fast 1.5.0 --5       815 MB/s   1939 MB/s     3873150  11.54 ../silesia/nci
+snappy 2020-07-11         751 MB/s   2390 MB/s     6146795  18.32 ../silesia/nci
+zstd_fast 1.5.0 --1       349 MB/s   1532 MB/s     4060898  66.01 ../silesia/ooffice
+zstd_fast 1.5.0 --5       573 MB/s   2065 MB/s     4590100  74.61 ../silesia/ooffice
+snappy 2020-07-11         283 MB/s   1034 MB/s     4311901  70.09 ../silesia/ooffice
+zstd_fast 1.5.0 --1       364 MB/s   1756 MB/s     4232700  41.97 ../silesia/osdb
+zstd_fast 1.5.0 --5       465 MB/s   1848 MB/s     4777293  47.37 ../silesia/osdb
+snappy 2020-07-11         448 MB/s   1502 MB/s     5412825  53.67 ../silesia/osdb
+zstd_fast 1.5.0 --1       248 MB/s   1120 MB/s     2452266  37.00 ../silesia/reymont
+zstd_fast 1.5.0 --5       277 MB/s   1250 MB/s     2876732  43.41 ../silesia/reymont
+snappy 2020-07-11         265 MB/s    811 MB/s     3234968  48.81 ../silesia/reymont
+zstd_fast 1.5.0 --1       451 MB/s   1700 MB/s     6293999  29.13 ../silesia/samba
+zstd_fast 1.5.0 --5       513 MB/s   1823 MB/s     7317207  33.87 ../silesia/samba
+snappy 2020-07-11         439 MB/s   1418 MB/s     8057361  37.29 ../silesia/samba
+zstd_fast 1.5.0 --1       343 MB/s   2540 MB/s     6550053  90.32 ../silesia/sao
+zstd_fast 1.5.0 --5       704 MB/s   3612 MB/s     6832035  94.21 ../silesia/sao
+snappy 2020-07-11         319 MB/s    984 MB/s     6469352  89.21 ../silesia/sao
+zstd_fast 1.5.0 --1       292 MB/s   1329 MB/s    17670128  42.62 ../silesia/webster
+zstd_fast 1.5.0 --5       354 MB/s   1457 MB/s    20560710  49.59 ../silesia/webster
+snappy 2020-07-11         268 MB/s    890 MB/s    20211213  48.75 ../silesia/webster
+zstd_fast 1.5.0 --1       595 MB/s   1988 MB/s      882720  16.51 ../silesia/xml
+zstd_fast 1.5.0 --5       661 MB/s   2067 MB/s      987361  18.47 ../silesia/xml
+snappy 2020-07-11         525 MB/s   1894 MB/s     1308581  24.48 ../silesia/xml
+zstd_fast 1.5.0 --1      2704 MB/s  12113 MB/s     8469221  99.94 ../silesia/x-ray
+zstd_fast 1.5.0 --5      3174 MB/s  12710 MB/s     8474445 100.00 ../silesia/x-ray
+snappy 2020-07-11        5995 MB/s  10287 MB/s     8459794  99.83 ../silesia/x-ray

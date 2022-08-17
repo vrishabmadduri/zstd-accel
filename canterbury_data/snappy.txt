@@ -1,0 +1,13 @@
+Compressor name         Compress.  Decompress. Compr. size  Ratio Filename
+memcpy                  35410 MB/s  35181 MB/s      152089 100.00 ../canterbury/alice29.txt
+snappy 2020-07-11         238 MB/s    758 MB/s       88034  57.88 ../canterbury/alice29.txt
+snappy 2020-07-11         229 MB/s    713 MB/s       77503  61.91 ../canterbury/asyoulik.txt
+snappy 2020-07-11         247 MB/s    808 MB/s      234661  54.99 ../canterbury/lcet10.txt
+snappy 2020-07-11         215 MB/s    652 MB/s      319267  66.26 ../canterbury/plrabn12.txt
+snappy 2020-07-11         494 MB/s   1308 MB/s       11838  48.12 ../canterbury/cp.html
+snappy 2020-07-11         649 MB/s   1190 MB/s      424523  41.23 ../canterbury/kennedy.xls
+snappy 2020-07-11         841 MB/s   2214 MB/s       92969  18.11 ../canterbury/ptt5
+snappy 2020-07-11         687 MB/s   1209 MB/s        2503  59.21 ../canterbury/xargs.1
+snappy 2020-07-11         769 MB/s   1184 MB/s        4735  42.47 ../canterbury/fields.c
+snappy 2020-07-11         819 MB/s   1376 MB/s        1800  48.37 ../canterbury/grammar.lsp
+snappy 2020-07-11         414 MB/s   1167 MB/s       18722  48.96 ../canterbury/sum

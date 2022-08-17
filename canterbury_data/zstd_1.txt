@@ -1,0 +1,13 @@
+Compressor name         Compress.  Decompress. Compr. size  Ratio Filename
+memcpy                  35402 MB/s  35181 MB/s      152089 100.00 ../canterbury/alice29.txt
+zstd 1.5.0 -1             198 MB/s   1017 MB/s       59716  39.26 ../canterbury/alice29.txt
+zstd 1.5.0 -1             218 MB/s   1080 MB/s       54561  43.59 ../canterbury/asyoulik.txt
+zstd 1.5.0 -1             238 MB/s   1175 MB/s      158672  37.18 ../canterbury/lcet10.txt
+zstd 1.5.0 -1             228 MB/s   1110 MB/s      218240  45.29 ../canterbury/plrabn12.txt
+zstd 1.5.0 -1             234 MB/s   1113 MB/s        8819  35.85 ../canterbury/cp.html
+zstd 1.5.0 -1             449 MB/s   1106 MB/s      115337  11.20 ../canterbury/kennedy.xls
+zstd 1.5.0 -1             724 MB/s   1998 MB/s       51580  10.05 ../canterbury/ptt5
+zstd 1.5.0 -1             254 MB/s    718 MB/s        1859  43.98 ../canterbury/xargs.1
+zstd 1.5.0 -1             301 MB/s    927 MB/s        3550  31.84 ../canterbury/fields.c
+zstd 1.5.0 -1             270 MB/s    715 MB/s        1333  35.82 ../canterbury/grammar.lsp
+zstd 1.5.0 -1             255 MB/s   1095 MB/s       13641  35.67 ../canterbury/sum

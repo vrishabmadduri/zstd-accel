@@ -1,0 +1,14 @@
+Compressor name         Compress.  Decompress. Compr. size  Ratio Filename
+memcpy                   6575 MB/s   6698 MB/s    10192446 100.00 ../silesia/dickens
+snappy 2020-07-11         223 MB/s    680 MB/s     6340267  62.21 ../silesia/dickens
+snappy 2020-07-11         382 MB/s   1186 MB/s    26690826  52.11 ../silesia/mozilla
+snappy 2020-07-11         391 MB/s    969 MB/s     5440451  54.57 ../silesia/mr
+snappy 2020-07-11         751 MB/s   2390 MB/s     6146795  18.32 ../silesia/nci
+snappy 2020-07-11         283 MB/s   1034 MB/s     4311901  70.09 ../silesia/ooffice
+snappy 2020-07-11         448 MB/s   1502 MB/s     5412825  53.67 ../silesia/osdb
+snappy 2020-07-11         265 MB/s    811 MB/s     3234968  48.81 ../silesia/reymont
+snappy 2020-07-11         439 MB/s   1418 MB/s     8057361  37.29 ../silesia/samba
+snappy 2020-07-11         319 MB/s    984 MB/s     6469352  89.21 ../silesia/sao
+snappy 2020-07-11         268 MB/s    890 MB/s    20211213  48.75 ../silesia/webster
+snappy 2020-07-11         525 MB/s   1894 MB/s     1308581  24.48 ../silesia/xml
+snappy 2020-07-11        5995 MB/s  10287 MB/s     8459794  99.83 ../silesia/x-ray

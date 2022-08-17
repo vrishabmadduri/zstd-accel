@@ -1,0 +1,13 @@
+Compressor name         Compress.  Decompress. Compr. size  Ratio Filename
+memcpy                  34510 MB/s  35173 MB/s      152089 100.00 ../canterbury/alice29.txt
+zlib 1.2.11 -9             11 MB/s    257 MB/s       54170  35.62 ../canterbury/alice29.txt
+zlib 1.2.11 -9             12 MB/s    238 MB/s       48778  38.97 ../canterbury/asyoulik.txt
+zlib 1.2.11 -9             13 MB/s    267 MB/s      144439  33.85 ../canterbury/lcet10.txt
+zlib 1.2.11 -9           8.33 MB/s    235 MB/s      194332  40.33 ../canterbury/plrabn12.txt
+zlib 1.2.11 -9             36 MB/s    284 MB/s        7940  32.27 ../canterbury/cp.html
+zlib 1.2.11 -9           2.53 MB/s    502 MB/s      207029  20.10 ../canterbury/kennedy.xls
+zlib 1.2.11 -9           7.20 MB/s    560 MB/s       52221  10.18 ../canterbury/ptt5
+zlib 1.2.11 -9             51 MB/s    359 MB/s        1736  41.07 ../canterbury/xargs.1
+zlib 1.2.11 -9             37 MB/s    368 MB/s        3115  27.94 ../canterbury/fields.c
+zlib 1.2.11 -9             53 MB/s    390 MB/s        1222  32.84 ../canterbury/grammar.lsp
+zlib 1.2.11 -9           3.53 MB/s    266 MB/s       12838  33.57 ../canterbury/sum
